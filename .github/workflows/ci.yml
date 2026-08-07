@@ -1,0 +1,97 @@
+name: API Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Nightly run catches API drift that no code change would reveal.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to target
+        type: choice
+        options: [production, staging, local]
+        default: production
+
+env:
+  TEST_ENV: ${{ github.event.inputs.environment || 'production' }}
+  LOG_LEVEL: warn
+
+jobs:
+  quality:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Format check
+        run: npm run format:check
+
+  smoke:
+    name: Smoke
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # No `playwright install` step: API tests use Playwright's request
+      # context, which needs no browser binaries. Saves ~40s and ~400MB per job.
+      - run: npm ci
+      - name: Smoke tests
+        run: npm run test:smoke
+        env:
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+
+  test:
+    name: Full suite
+    runs-on: ubuntu-latest
+    # Gated on smoke so a full outage fails in seconds, not minutes.
+    needs: smoke
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Run API tests
+        run: npm run test:ci
+        env:
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            reports/
+          retention-days: 30
+
+      - name: Publish results
+        if: always()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: reports/junit.xml
+          fail_on_failure: true
+
+      - name: Publish defect register to the job summary
+        if: always()
+        run: cat reports/defect-register.md >> "$GITHUB_STEP_SUMMARY"

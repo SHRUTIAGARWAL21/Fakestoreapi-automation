@@ -1,0 +1,29 @@
+{
+  "name": "cart-error-envelope",
+  "version": "v1",
+  "recordedAt": "2026-08-07T16:35:24.434Z",
+  "endpoint": "GET /carts/:id (invalid id)",
+  "shape": {
+    "kind": "object",
+    "properties": {
+      "message": {
+        "shape": {
+          "kind": "primitive",
+          "types": [
+            "string"
+          ]
+        },
+        "required": true
+      },
+      "status": {
+        "shape": {
+          "kind": "primitive",
+          "types": [
+            "string"
+          ]
+        },
+        "required": true
+      }
+    }
+  }
+}

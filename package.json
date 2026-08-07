@@ -1,0 +1,45 @@
+{
+  "name": "fakestoreapi-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade API automation framework for the FakeStore API, focused on the Cart domain.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:carts": "playwright test tests/carts",
+    "test:auth": "playwright test tests/auth",
+    "test:contract": "playwright test --project=contract",
+    "test:functional": "playwright test --project=functional",
+    "test:negative": "playwright test --grep @negative",
+    "test:data-driven": "playwright test --grep @data-driven",
+    "test:ci": "playwright test --forbid-only",
+    "contract:update": "cross-env UPDATE_CONTRACTS=true playwright test --project=contract",
+    "report": "playwright show-report reports/html",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "npm run typecheck && npm run lint && npm run format:check",
+    "clean": "rimraf reports test-results"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-playwright": "^2.1.0",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1"
+  }
+}

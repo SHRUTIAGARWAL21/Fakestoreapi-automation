@@ -1,0 +1,67 @@
+{
+  "name": "cart-create",
+  "version": "v1",
+  "recordedAt": "2026-08-07T16:35:22.599Z",
+  "endpoint": "POST /carts",
+  "shape": {
+    "kind": "object",
+    "properties": {
+      "date": {
+        "shape": {
+          "kind": "primitive",
+          "types": [
+            "string"
+          ]
+        },
+        "required": true
+      },
+      "id": {
+        "shape": {
+          "kind": "primitive",
+          "types": [
+            "integer"
+          ]
+        },
+        "required": true
+      },
+      "products": {
+        "shape": {
+          "kind": "array",
+          "items": {
+            "kind": "object",
+            "properties": {
+              "productId": {
+                "shape": {
+                  "kind": "primitive",
+                  "types": [
+                    "integer"
+                  ]
+                },
+                "required": true
+              },
+              "quantity": {
+                "shape": {
+                  "kind": "primitive",
+                  "types": [
+                    "integer"
+                  ]
+                },
+                "required": true
+              }
+            }
+          }
+        },
+        "required": true
+      },
+      "userId": {
+        "shape": {
+          "kind": "primitive",
+          "types": [
+            "integer"
+          ]
+        },
+        "required": true
+      }
+    }
+  }
+}
